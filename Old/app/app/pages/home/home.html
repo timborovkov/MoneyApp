@@ -1,0 +1,154 @@
+<style media="screen">
+  .cards{
+    margin-top: 70px;
+  }
+  .card-main{
+    max-width: 450px !important;
+    min-width: 200px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    float: none !important;
+  }
+  .moreInfo{
+    position: fixed;
+    top: 100px;
+    width: 100%;
+    z-index: 0;
+  }
+</style>
+<script type="text/javascript">
+  $(document).ready(function(){
+    //Load offers to the screen
+    //Request offers from server
+    firebaseGetOffers(function(Offers){
+      var done_count = 0;
+      var offers = [];
+
+      for (var offer in Offers) {
+        if (Offers.hasOwnProperty(offer)) {
+          var thisOffer = Offers[offer];
+          thisOffer['id'] = offer;
+          firebaseGetInfoOnUser(thisOffer.borrower, function(user){
+            thisOffer['first_name'] = user.firstname;
+            thisOffer['last_name'] = user.lastname;
+            thisOffer['picture'] = user.picture;
+            thisOffer['about'] = user.about_me;
+            thisOffer['score'] = user.credit_score;
+            thisOffer['age'] = getAge(user.birthday);
+            thisOffer['likes'] = eval("(" + user.likes + ')');
+            thisOffer['loansCount'] = user.loansCount;
+            thisOffer['recomendationCount'] = user.recomendation_count;
+            thisOffer['socialMedia'] = [];
+            thisOffer['socialMedia'].push(user.facebook);
+            thisOffer['socialMedia'].push(user.twitter);
+            thisOffer['socialMedia'].push(user.instagram);
+            thisOffer['socialMedia'].push(user.linkedin);
+
+            offers.push(thisOffer);
+
+            done_count++;
+          });
+        }
+      }
+      var interval = setInterval(function(){
+        if(done_count == Object.keys(Offers).length){
+          clearInterval(interval);
+          afterLoad(offers);
+        }
+      }, 500);
+    });
+
+    function afterLoad(offers){
+      app.offers = offers;
+      for (var i = 0; i < offers.length; i++) {
+        var offer = offers[i];
+        var thiscard = "";
+        thiscard +=   '<div class="row">';
+        thiscard +=     '<div class="col s12 m7 card-main">';
+        thiscard +=       '<div class="card">';
+        thiscard +=         '<div class="card-image">';
+        thiscard +=           '<img src="'+offer.picture+'">';
+        thiscard +=           '<span class="card-title">'+offer.first_name+' '+offer.last_name+' needs $ '+offer.amount+'</span>';
+        thiscard +=         '</div>';
+        thiscard +=         '<div class="card-content black-text">';
+        thiscard +=           '<p>Credit score: '+offer.score+'<br>'+offer.details+'</p>';
+        thiscard +=         '</div>';
+        thiscard +=         '<div class="card-action">';
+        thiscard +=           '<a class="waves-effect waves-light btn supportBtn" id="'+offer.id+'">Give a loan</a>';
+        thiscard +=           '<a class="userInfoBtn" style="margin-left: 10px;" id="'+offer.id+'">More Info</a>';
+        thiscard +=           '<h6>Will pay back after: '+offer.payback+'</h6>';
+        thiscard +=         '</div>';
+        thiscard +=       '</div>';
+        thiscard +=     '</div>';
+        thiscard +=   '</div>';
+
+        $('.cards').append(thiscard);
+      }
+      $(".supportBtn").click(function(){
+        var id = $(this).attr("id");
+        console.log(id);
+        setCookie('giveLoanTo', id, 1);
+        $(".home_content").load('pages/giveLoan/do.html');
+      });
+      $(".userInfoBtn").click(function(){
+        var id = $(this).attr("id");
+        var offer = getOfferById(id);
+
+        var htmlWithInfo = "";
+        htmlWithInfo += '<div class="modal fade in" style="display: block;">';
+        htmlWithInfo +=   '<div class="modal-dialog modal-lg">';
+        htmlWithInfo +=       '<div class="modal-content">';
+        htmlWithInfo +=            '<i class="fa fa-times-circle close-modal fa-2x"></i>';
+        htmlWithInfo +=            '<div class="if"></div>';
+        htmlWithInfo +=            '<div class="track-body">';
+        htmlWithInfo +=               '<h5>Hello, I am '+offer.first_name+' '+offer.last_name+'</h5>';
+        htmlWithInfo +=               '<h5>My Age</h5><p>'+offer.age+' years old</p>';
+        htmlWithInfo +=               '<h5>How much money I need?</h5><p>$ '+offer.amount+'</p>';
+        htmlWithInfo +=               '<h5>When do I need it? </h5><p>'+offer.deadline+'</p>';
+        htmlWithInfo +=               '<h5>Why I need money?</h5><p>'+offer.details+'</p>';
+        htmlWithInfo +=               '<p style="font-size: 18px;">I got '+offer.recomendationCount+' recomendations at the moment, ';
+        htmlWithInfo +=               'with total '+offer.loansCount+' loans I took</p>';
+        htmlWithInfo +=               '<h5>I like a bunch of things: </h5>';
+        for (var i = 0; i < offer.likes.length; i++) {
+          var like = offer.likes[i];
+          htmlWithInfo += '<i class="fa fa-'+like+' fa-2x" style="margin-left: 10px;"></i> ';
+        }
+        htmlWithInfo +=               '<h5>Me in social media: </h5>';
+        for (var i = 0; i < offer.socialMedia.length; i++) {
+          var media = offer.socialMedia[i];
+          if(media.indexOf('facebook') !== -1) {
+            htmlWithInfo += '<a href="'+media+'"><i class="fa fa-facebook fa-2x" style="margin-left: 20px;"></i></a>'
+          }else if (media.indexOf('twitter') !== -1) {
+            htmlWithInfo += '<a href="'+media+'"><i class="fa fa-twitter fa-2x" style="margin-left: 20px;"></i></a>'
+          }else if (media.indexOf('instagram') !== -1) {
+            htmlWithInfo += '<a href="'+media+'"><i class="fa fa-instagram fa-2x" style="margin-left: 20px;"></i></a>'
+          }else if (media.indexOf('linkedin') !== -1) {
+            htmlWithInfo += '<a href="'+media+'"><i class="fa fa-linkedin fa-2x" style="margin-left: 20px;"></i></a>'
+          }
+        }
+        htmlWithInfo +=               '<h5>About myself: </h5><p>'+offer.about+'</p>';
+        htmlWithInfo +=               '<br><br><p>Ps. You will get additional iformation, such as address, contact information and national identification number</p>';
+        htmlWithInfo +=            '</div>';
+        htmlWithInfo +=       '</div>';
+        htmlWithInfo +=   '</div>';
+        htmlWithInfo += '</div>';
+
+        $(".moreInfo").css("z-index", "1000");
+        $(".moreInfo").html(htmlWithInfo);
+
+        $(".close-modal").click(function(){
+          $(".moreInfo").css("z-index", "0");
+          $(".moreInfo").html("");
+        });
+      });
+    }
+  });
+</script>
+
+<div class="cards">
+
+</div>
+
+<div class="moreInfo">
+
+</div>

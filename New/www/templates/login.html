@@ -1,0 +1,37 @@
+<ion-view title="Login" id="page2" style="background-color:#FFFFFF;" class=" ">
+    <ion-content padding="false" style="background: url(img/SXadHy65R4S3h5yOz2d4_czech_republic_prague_street_building_evening_94209_1080x1920.jpg) no-repeat center;background-size:cover;" scroll="false" class="has-header">
+        <div>
+            <style>
+                .input-label.loginPageInputLabel{
+                    color: white;
+                    font-size: 17px;
+                    font-weight: bold;
+                }
+                .loginPageInput{
+                    border-width: 0px;
+                    width: calc(100% + 13px);
+                    left: -13px;
+                }
+            </style>
+        </div>
+        <div class="spacer" style="width: 300px; height: 20px;"></div>
+        <div class="">
+            <img src="http://kellizio.com/img/logo/money.png" width="150" height="auto" style="display: block; margin-left: auto; margin-right: auto;">
+        </div>
+        <form id="login-form1" class="list ">
+            <ion-list id="login-list1" class=" ">
+                <label class="item item-input item-stacked-label loginPageInput" id="login-input1">
+                    <span class="input-label loginPageInputLabel">Email</span>
+                    <input type="email" placeholder="">
+                </label>
+                <label class="item item-input item-stacked-label loginPageInput" id="login-input2">
+                    <span class="input-label loginPageInputLabel">Password</span>
+                    <input type="password" placeholder="">
+                </label>
+            </ion-list>
+            <div class="spacer" style="width: 300px; height: 26px;"></div>
+            <button id="login-button1" class=" button button-positive  button-block ">Log in</button>
+            <a ui-sref="signUp" id="login-button6" class=" button button-light  button-block ">Or create an acount</a>
+        </form>
+    </ion-content>
+</ion-view>

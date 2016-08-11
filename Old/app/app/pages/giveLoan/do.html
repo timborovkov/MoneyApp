@@ -1,0 +1,123 @@
+<link rel="stylesheet" href="css/reveal.css">
+<link rel="stylesheet" href="css/reveal_theme/simple.css">
+<style media="screen">
+  .moreInfo{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    z-index: 0;
+  }
+</style>
+
+<div class="reveal slide center">
+    <div class="slides">
+        <section>
+          <h2>For more information we recomend you to click "More Info" on offers card.</h2>
+          <p>
+            Card is on previous page
+          </p>
+        </section>
+        <section>
+          <h2>Contact information, address, national identification number will be sent to your email!</h2>
+        </section>
+        <section>
+          <h4>Please, choose intress rate you want</h4>
+          <h5 class="intressLabel">10 %</h5>
+          <h5 class="winLabel"></h5>
+          <p class="range-field">
+            <input type="range" class="intressInput" min="2" max="70" value="10"/>
+          </p>
+        </section>
+        <section>
+          <!-- When you want your money to be paid back -->
+          <h4>Please choose, when do you want to get your money back</h4>
+          <p>By default it is set to the date borrower wanted.</p>
+          <p class="dateDef"></p>
+          <input type="date" class="datepicker">
+        </section>
+        <section>
+          <!-- Final result -->
+          <style media="screen">
+            p{
+              font-size: 65% !important;
+            }
+          </style>
+          <table align="center" class="total_data">
+            <tr>
+              <td>
+                <h3>Total</h3>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <p class="amount"></p>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <p class="towho"></p>
+                <a class="showBorrowerInfo" style="font-size: 25px;">More info about borrower</a>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <p class="back"></p>
+              </td>
+            </tr>
+          </table>
+        </section>
+        <section>
+          <button class="waves-effect waves-light btn giveBtn" style="width: 100%; height: 70px; font-size: 60px;">Give Loan</button>
+          <br><br>
+          <button class="waves-effect waves-light btn cancelBtn" style="width: 100%; height: 70px; font-size: 60px; background-color: #f44444;">Cancel</button>
+        </section>
+    </div>
+</div>
+
+<script>
+    Reveal.initialize();
+    $(document).ready(function(){
+
+      //Setup reveal.js
+      $(".reveal .controls .navigate-left").css("right","75px");
+
+      //Get offer
+      var giveTo = getCookie('giveLoanTo');
+      var offer = getOfferById(giveTo);
+
+      //1. Intress rate
+      $('.intressInput').val(offer.intress);
+      $(".winLabel").html("You will get $ " + (offer.amount / 100 * 5) + " from this deal");
+      $(".intressInput").change(function(){
+        var value = $(this).val();
+        $(".intressLabel").html(value + " %");
+        var win = offer.amount / 100 * value;
+        $(".winLabel").html("You will get $ " + win + " from this deal");
+        offer.intress = val;
+      });
+
+      //2. Payback date
+      $(".dateDef").html(offer.payback);
+      $(".datepicker").change(function(){
+        var date = $(this).val();
+        $(".dateDef").html(date);
+        offer.payback = date;
+      });
+
+      //3. Total screen
+      $('.amount').html('You are going to loan '+offer.amount+' €');
+      $('.towho').html('To '+offer.first_name+' ' +offer.last_name);
+      $('.back').html('You will recieve '+( offer.amount + (offer.amount / 100 * offer.intress))+' € before '+offer.payback);
+      $('.showBorrowerInfo').click(function(){
+
+      });
+
+      //4. Complete
+      $(".giveBtn").click(function(){
+        // TODO
+      });
+      $(".cancelBtn").click(function(){
+        $(".home_content").load('pages/home.html');
+      });
+    });
+</script>
